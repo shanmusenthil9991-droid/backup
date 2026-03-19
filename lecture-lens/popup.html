@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LectureLens</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/popup.css">
+</head>
+<body>
+  <!-- Ambient background -->
+  <div class="ambient-bg">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="logo-group">
+      <div class="logo-icon">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+          <path d="M11 2L13.5 8H20L15 12L17 18.5L11 15L5 18.5L7 12L2 8H8.5L11 2Z" fill="url(#star-grad)" stroke="none"/>
+          <defs>
+            <linearGradient id="star-grad" x1="2" y1="2" x2="20" y2="20" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#a78bfa"/>
+              <stop offset="100%" stop-color="#38bdf8"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <div class="logo-text">
+        <span class="logo-name">LectureLens</span>
+        <span class="logo-tag">AI Study Assistant</span>
+      </div>
+    </div>
+    <div class="status-pill" id="statusPill">
+      <span class="status-dot"></span>
+      <span id="statusText">Ready</span>
+    </div>
+  </header>
+
+  <!-- Video info bar -->
+  <div class="video-bar" id="videoBar">
+    <div class="video-thumb-wrap">
+      <div class="video-thumb-placeholder">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="5 3 19 12 5 21 5 3"/>
+        </svg>
+      </div>
+    </div>
+    <div class="video-meta">
+      <p class="video-title" id="videoTitle">No video detected</p>
+      <p class="video-sub" id="videoSub">Navigate to a YouTube lecture</p>
+    </div>
+  </div>
+
+  <!-- API Key setup -->
+  <div class="api-setup" id="apiSetup">
+    <div class="setup-icon">🔑</div>
+    <p class="setup-title">API Key Required</p>
+    <p class="setup-desc">Enter your free Groq API key to unlock AI analysis</p>
+    <div class="key-input-wrap">
+      <input type="password" id="apiKeyInput" placeholder="gsk_..." class="key-input" />
+      <button class="key-btn" id="saveKeyBtn">Save</button>
+    </div>
+    <p class="setup-hint">Free key from console.groq.com · stored locally</p>
+  </div>
+
+  <!-- Main action buttons -->
+  <div class="action-panel" id="actionPanel" style="display:none;">
+    <button class="action-btn primary" id="analyzeBtn">
+      <div class="btn-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+          <path d="M11 8v6M8 11h6"/>
+        </svg>
+      </div>
+      <div class="btn-content">
+        <span class="btn-label">Analyze Video</span>
+        <span class="btn-sub">Full summary + key insights</span>
+      </div>
+      <div class="btn-arrow">→</div>
+    </button>
+
+    <button class="action-btn secondary" id="mcqBtn">
+      <div class="btn-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+        </svg>
+      </div>
+      <div class="btn-content">
+        <span class="btn-label">Generate MCQs</span>
+        <span class="btn-sub">20 practice questions</span>
+      </div>
+      <div class="btn-arrow">→</div>
+    </button>
+
+    <div class="btn-row">
+      <button class="mini-btn" id="changeKeyBtn">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>
+        </svg>
+        Change Key
+      </button>
+      <button class="mini-btn" id="clearBtn">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/>
+        </svg>
+        Clear Results
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading state -->
+  <div class="loading-panel" id="loadingPanel" style="display:none;">
+    <div class="loading-visual">
+      <div class="loading-rings">
+        <div class="ring ring-1"></div>
+        <div class="ring ring-2"></div>
+        <div class="ring ring-3"></div>
+      </div>
+      <div class="loading-icon-center">
+        <svg width="20" height="20" viewBox="0 0 22 22" fill="none">
+          <path d="M11 2L13.5 8H20L15 12L17 18.5L11 15L5 18.5L7 12L2 8H8.5L11 2Z" fill="url(#star-grad2)"/>
+          <defs>
+            <linearGradient id="star-grad2" x1="2" y1="2" x2="20" y2="20" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#a78bfa"/>
+              <stop offset="100%" stop-color="#38bdf8"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+    </div>
+    <p class="loading-title" id="loadingTitle">Analyzing video...</p>
+    <p class="loading-sub" id="loadingSub">Extracting transcript and processing content</p>
+    <div class="loading-steps" id="loadingSteps">
+      <div class="step active" id="step1">
+        <div class="step-dot"></div>
+        <span>Fetching transcript</span>
+      </div>
+      <div class="step" id="step2">
+        <div class="step-dot"></div>
+        <span>Classifying content</span>
+      </div>
+      <div class="step" id="step3">
+        <div class="step-dot"></div>
+        <span>Generating AI response</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Results panel -->
+  <div class="results-panel" id="resultsPanel" style="display:none;">
+    <div class="results-header">
+      <div class="results-badge" id="contentTypeBadge">Lecture</div>
+      <h2 class="results-title" id="resultsTitle">Video Summary</h2>
+      <button class="back-btn" id="backBtn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M19 12H5M12 5l-7 7 7 7"/>
+        </svg>
+        Back
+      </button>
+    </div>
+    <div class="results-content" id="resultsContent"></div>
+    <div class="results-footer">
+      <button class="footer-btn" id="copyBtn">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+        </svg>
+        Copy
+      </button>
+      <button class="footer-btn" id="newMcqBtn" style="display:none;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 11l3 3L22 4"/>
+        </svg>
+        New MCQs
+      </button>
+    </div>
+  </div>
+
+  <!-- Not a lecture modal -->
+  <div class="modal-overlay" id="notLectureModal" style="display:none;">
+    <div class="modal-card">
+      <div class="modal-icon">🎬</div>
+      <h3 class="modal-title">Not Study Material</h3>
+      <p class="modal-desc">This video doesn't appear to be a lecture, course, tutorial, or educational story. LectureLens works best with academic content, coding tutorials, science lectures, math lessons, and educational stories.</p>
+      <button class="modal-btn" id="closeModal">Got it</button>
+    </div>
+  </div>
+
+  <script src="js/popup.js"></script>
+</body>
+</html>

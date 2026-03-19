@@ -1,0 +1,34 @@
+{
+  "manifest_version": 3,
+  "name": "LectureLens – Smart Study Assistant",
+  "version": "1.0.0",
+  "description": "Instantly summarize lecture videos and generate practice MCQs with AI-powered step-by-step explanations.",
+  "permissions": ["activeTab", "scripting", "storage"],
+  "host_permissions": [
+    "https://www.youtube.com/*",
+    "https://api.groq.com/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.youtube.com/*"],
+      "js": ["js/content.js"]
+    }
+  ],
+  "background": {
+    "service_worker": "js/background.js"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["css/*", "js/*", "icons/*"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}
